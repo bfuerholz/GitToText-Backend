@@ -1,10 +1,9 @@
 {
-    "version": 2,
-    "builds": [
-      { "src": "server.py", "use": "@vercel/python" }
-    ],
-    "routes": [
-      { "src": "/(.*)", "dest": "server.py" }
-    ]
-  }
-  
+  "version": 2,
+  "builds": [
+    { "src": "RepoToText.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "RepoToText.py" }
+  ]
+}
