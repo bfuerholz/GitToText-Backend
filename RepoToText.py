@@ -88,7 +88,7 @@ class GitHubRepoScraper:
         logging.info("Done.")
         return filename
 
-@app.route("/scrape", methods=["POST"])
+@app.route("/api/scrape", methods=["POST"])
 def scrape():
     data = request.get_json()
     repo_url = data.get("repoUrl")
