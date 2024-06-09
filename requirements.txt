@@ -1,0 +1,7 @@
+flask
+flask-cors
+python-dotenv
+pygithub
+beautifulsoup4
+requests
+retry
