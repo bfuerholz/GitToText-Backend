@@ -58,35 +58,21 @@ class GitHubRepoScraper:
             logging.error(f"Error processing file {file_content.path}: {e}")
             return None
 
-    def write_to_file(self, files_data):
-        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-        filename = f"{self.repo_name.replace('/', '_')}_{timestamp}.txt"
-        with open(filename, "w", encoding="utf-8") as f:
-            for file_data in files_data:
-                f.write(f"--- {file_data['name']} ---\n")
-                f.write(file_data["content"])
-                f.write("\n\n")
-        return filename
-
-    def clean_up_text(self, filename):
-        with open(filename, "r", encoding="utf-8") as f:
-            text = f.read()
-        cleaned_text = re.sub("\n{3,}", "\n\n", text)
-        with open(filename, "w", encoding="utf-8") as f:
-            f.write(cleaned_text)
+    def get_combined_file_data(self, files_data):
+        combined_data = ""
+        for file_data in files_data:
+            combined_data += f"--- {file_data['name']} ---\n"
+            combined_data += file_data["content"]
+            combined_data += "\n\n"
+        cleaned_data = re.sub("\n{3,}", "\n\n", combined_data)
+        return cleaned_data
 
     def run(self):
         logging.info(f"Fetching all files from {self.repo_name}...")
         files_data = self.fetch_all_files()
-
-        logging.info("Writing to file...")
-        filename = self.write_to_file(files_data)
-
-        logging.info("Cleaning up file...")
-        self.clean_up_text(filename)
-
+        combined_data = self.get_combined_file_data(files_data)
         logging.info("Done.")
-        return filename
+        return combined_data
 
 @app.route("/api/scrape", methods=["POST"])
 def scrape():
@@ -101,8 +87,8 @@ def scrape():
     scraper = GitHubRepoScraper(repo_name, selected_file_types)
 
     try:
-        filename = scraper.run()
-        return jsonify({"message": "Success", "filename": filename})
+        combined_data = scraper.run()
+        return jsonify({"message": "Success", "data": combined_data})
     except Exception as e:
         logging.error(f"Error scraping repository: {e}")
         return jsonify({"error": "Failed to scrape repository"}), 500
